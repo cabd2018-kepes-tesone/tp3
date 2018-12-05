@@ -10,24 +10,28 @@ ssc.checkpoint("buffer")
 
 stream = ssc.socketTextStream("localhost", 7777)
 
-def armarTupla (dato):
+def armarTupla(dato):
     t = dato.split(';')
+
     return (int(t[0]), 1 if t[4] <> '' else 0)
 
-counts = stream.map(armarTupla) \
+counts = stream \
+    .map(armarTupla) \
     .filter(lambda t: t[1] > 0) \
     .reduceByKey(lambda a, b: a + b)
 
-def fUpdate (newValues , history):
-    if(history == None):
+def fUpdate(newValues , history):
+    if (history == None):
         history = 0
-    if( newValues == None):
+
+    if (newValues == None):
         newValues = 0
     else:
-        newValues = sum( newValues )
-    return  newValues +  history
+        newValues = sum(newValues)
 
-history = counts.updateStateByKey ( fUpdate )
+    return newValues + history
+
+history = counts.updateStateByKey(fUpdate)
 
 history.pprint()
 
